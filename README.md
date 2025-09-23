@@ -1,5 +1,6 @@
 # CA-Cut: Crop-Aligned Cutout for Data Augmentation to Learn More Robust Under-Canopy Navigation (Accepted @ ECMR 2025) 
 
+[![IEEE](https://img.shields.io/badge/IEEE-11163018-b31b1b.svg)](https://ieeexplore.ieee.org/document/11163018)
 [![arXiv](https://img.shields.io/badge/arXiv-2401.12345-b31b1b.svg)](https://www.arxiv.org/abs/2507.17727)
 
 # Environment Setup
@@ -10,7 +11,7 @@ git clone git@github.com:mamorobel/CA-Cut.git
 cd CA-Cut/tools/
 ```
 ### Run the environment setup scripts
-Linux/Mac
+Linux
 ```
 chmod +x setup.sh
 ```
@@ -90,12 +91,13 @@ Feel free to play around with the configurations to see how model performance ch
 If you use this work in your research, please cite:
 
 ```bibtex
-@misc{mamo2025cacutcropalignedcutoutdata,
-      title={CA-Cut: Crop-Aligned Cutout for Data Augmentation to Learn More Robust Under-Canopy Navigation}, 
-      author={Robel Mamo and Taeyeong Choi},
-      year={2025},
-      eprint={2507.17727},
-      archivePrefix={arXiv},
-      primaryClass={cs.RO},
-      url={https://arxiv.org/abs/2507.17727}, 
-}
+@INPROCEEDINGS{11163018,
+  author={Mamo, Robel and Choi, Taeyeong},
+  booktitle={2025 European Conference on Mobile Robots (ECMR)}, 
+  title={CA-Cut: Crop-Aligned Cutout for Data Augmentation to Learn More Robust Under-Canopy Navigation}, 
+  year={2025},
+  volume={},
+  number={},
+  pages={1-6},
+  keywords={Training;Visualization;Accuracy;Navigation;Source coding;Crops;Training data;Data augmentation;Robustness;Data models},
+  doi={10.1109/ECMR65884.2025.11163018}}
