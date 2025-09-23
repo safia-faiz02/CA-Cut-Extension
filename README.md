@@ -100,4 +100,5 @@ If you use this work in your research, please cite:
   number={},
   pages={1-6},
   keywords={Training;Visualization;Accuracy;Navigation;Source coding;Crops;Training data;Data augmentation;Robustness;Data models},
-  doi={10.1109/ECMR65884.2025.11163018}}
+  doi={10.1109/ECMR65884.2025.11163018}
+}
