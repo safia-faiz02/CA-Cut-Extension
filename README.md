@@ -1,4 +1,4 @@
-# CA-Cut: Crop-Aligned Cutout for Data Augmentation to Learn More Robust Under-Canopy Navigation (Accepted @ ECMR 2025) 
+# CA-Cut: Crop-Aligned Cutout for Data Augmentation to Learn More Robust Under-Canopy Navigation (Published @ ECMR 2025) 
 
 [![IEEE](https://img.shields.io/badge/IEEE-11163018-b31b1b.svg)](https://ieeexplore.ieee.org/document/11163018)
 [![arXiv](https://img.shields.io/badge/arXiv-2401.12345-b31b1b.svg)](https://www.arxiv.org/abs/2507.17727)
