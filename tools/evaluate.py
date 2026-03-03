@@ -15,8 +15,8 @@ class ImageData(Dataset):
         super().__init__()
         self.df = df
         self.transform = transform
-        self.dir = "../data/labeled"
-        self.label_dir = "../data/gt_image_labels"
+        self.dir = "/content/CA-Cut-main/data/labels"
+        self.label_dir = "/content/CA-Cut-main/data/gt_image_labels"
         self.img_path, self.label_path = self.get_image_paths()
 
     def get_image_paths(self):
@@ -62,7 +62,7 @@ def l2_distance(model, data, device='cuda'):
         for image, label, v_x, v_y, l_x, l_y, r_x, r_y in data:
             image = image.to(device).unsqueeze(0)
             label = label.to(device).unsqueeze(0)
-
+            image = apply_domain_shift(image, 3)
             prediction = model(image).squeeze(0).cpu()
 
             r = prediction[0, :, :]
@@ -72,15 +72,15 @@ def l2_distance(model, data, device='cuda'):
             channel_shape = r.shape
 
             r = torch.flatten(r)
-            r = torch.nn.functional.softmax(r) * 255
+            r = torch.nn.functional.softmax(r, dim=0) * 255
             r = r.reshape(channel_shape)
 
             g = torch.flatten(g)
-            g = torch.nn.functional.softmax(g) * 255
+            g = torch.nn.functional.softmax(g, dim=0) * 255
             g = g.reshape(channel_shape)
 
             b = torch.flatten(b)
-            b = torch.nn.functional.softmax(b) * 255
+            b = torch.nn.functional.softmax(b, dim=0) * 255
             b = b.reshape(channel_shape)
 
             '''
@@ -140,8 +140,30 @@ def split_data(df, train_size: int):
 
     return train, test
 
+def apply_domain_shift(inputs, domain_id):
+        if domain_id == 0:
+            # Original (no shift)
+            return inputs
+
+        elif domain_id == 1:
+            # Strong brightness shift
+            jitter = transforms.ColorJitter(brightness=1.5)
+            return jitter(inputs)
+
+        elif domain_id == 2:
+            # Strong hue shift
+            jitter = transforms.ColorJitter(hue=0.4)
+            return jitter(inputs)
+
+        elif domain_id == 3:
+            # Blur + noise simulation
+            blur = transforms.GaussianBlur(kernel_size=(15, 15))
+            return blur(inputs)
+
+        return inputs
+
 def main(model):
-    df = pd.read_csv("../data/gt_labels.csv")
+    df = pd.read_csv("/content/CA-Cut-main/data/gt_labels.csv")
     df = df.sort_values(by=['image_name'])
     
     seq1 = df[:273]
