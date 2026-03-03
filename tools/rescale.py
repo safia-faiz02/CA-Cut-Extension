@@ -69,7 +69,7 @@ def generate_labels(csv_file,
         img[s_ry, s_rx, 1] = 255
         img[s_ly, s_lx, 2] = 255
 
-        img = Image.fromarray(img, mode='RGB')
+        img = Image.fromarray(img)
 
         if not os.path.exists(scaled_output_lbls_dir):
             os.makedirs(scaled_output_lbls_dir)
@@ -84,7 +84,7 @@ def generate_labels(csv_file,
         img[int(ry), int(rx), 1] = 255
         img[int(ly), int(lx), 2] = 255
 
-        img = Image.fromarray(img, mode='RGB')
+        img = Image.fromarray(img)
 
         if not os.path.exists(original_output_lbls_dir):
             os.makedirs(original_output_lbls_dir)
@@ -95,11 +95,11 @@ def generate_labels(csv_file,
     df.to_csv(scaled_output_csv_dir, index=False)
 
 if __name__ == '__main__':
-    csv_file = '../data/gt_labels.csv'
+    csv_file = '/content/CA-Cut-main/data/gt_labels.csv'
     
-    original_output_lbls_dir = '../data/gt_image_labels'
-    scaled_output_lbls_dir = '../data/scaled_image_labels'
-    scaled_output_csv_dir = '../data/scaled_labels.csv'
+    original_output_lbls_dir = '/content/CA-Cut-main/data/gt_image_labels'
+    scaled_output_lbls_dir = '/content/CA-Cut-main/data/scaled_image_labels'
+    scaled_output_csv_dir = '/content/CA-Cut-main/data/scaled_labels.csv'
 
     original_img_size = (1280, 720)
     scaled_img_size = (320, 224)
