@@ -25,8 +25,8 @@ class ImageData(Dataset):
         super().__init__()
         self.df = df
         self.transform = transform
-        self.dir = "../data/labeled"
-        self.label_dir = "../data/scaled_image_labels"
+        self.dir = "/content/CA-Cut-main/data/labels"
+        self.label_dir = "/content/CA-Cut-main/data/scaled_image_labels"
         self.img_path, self.label_path = self.get_image_paths()
 
     def get_image_paths(self):
@@ -67,7 +67,7 @@ class UNet(nn.Module):
     def __init__(self):
         super().__init__()
         self.model = models.resnet18(weights=models.ResNet18_Weights.IMAGENET1K_V1)
-        self.checkpoint_path = '../checkpoints/resnet18_checkpoint.pth'
+        self.checkpoint_path = '/content/CA-Cut-main/checkpoints/resnet18_checkpoint.pth'
         torch.save(self.model.state_dict(), self.checkpoint_path)
         
         self.model.load_state_dict(torch.load(self.checkpoint_path))
@@ -162,6 +162,28 @@ def get_candidate(v_x, v_y, l_x, l_y, r_x, r_y, epochs, starting, ending):
     
     return int(x), int(y)
 
+def apply_domain_shift(inputs, domain_id):
+        if domain_id == 0:
+            # Original (no shift)
+            return inputs
+
+        elif domain_id == 1:
+            # Strong brightness shift
+            jitter = transforms.ColorJitter(brightness=1.5)
+            return jitter(inputs)
+
+        elif domain_id == 2:
+            # Strong hue shift
+            jitter = transforms.ColorJitter(hue=0.4)
+            return jitter(inputs)
+
+        elif domain_id == 3:
+            # Blur + noise simulation
+            blur = transforms.GaussianBlur(kernel_size=(15, 15))
+            return blur(inputs)
+
+        return inputs
+
 def custom_erase(img, candidates, height, width):
     x, y = candidates
 
@@ -197,6 +219,10 @@ def train(model, optimizer, loss_fn, train_loader, val_loader, img_height, img_w
             optimizer.zero_grad()
 
             inputs, targets, v_x, v_y, l_x, l_y, r_x, r_y = batch
+
+            # Randomly assign domain (0,1,2)
+            domain_id = random.choice([0,1,2])  # Hold out domain 3 for testing
+            inputs = apply_domain_shift(inputs, domain_id)
 
             if config['cutout']:
                 width, height = config['mask_size']
@@ -243,9 +269,6 @@ def train(model, optimizer, loss_fn, train_loader, val_loader, img_height, img_w
                         inputs[i] = transforms.functional.vflip(input)
                         targets[i] = transforms.functional.vflip(targets[i])
 
-            inputs = transforms.GaussianBlur(kernel_size=(11, 11))(inputs)
-            inputs = transforms.ColorJitter(brightness=0.5, contrast=.5, saturation=0.5, hue=0.5)(inputs)
-
             inputs = inputs.to(device)
             targets = targets.to(device)
             output = model(inputs)
@@ -272,6 +295,7 @@ def train(model, optimizer, loss_fn, train_loader, val_loader, img_height, img_w
         with torch.no_grad():
             for batch in val_loader:
                 inputs, targets, v_x, v_y, l_x, l_y, r_x, r_y = batch
+                inputs = apply_domain_shift(inputs, 3)  
                 inputs = inputs.to(device)
                 targets = targets.to(device)
                 output = model(inputs)
@@ -294,7 +318,7 @@ def train(model, optimizer, loss_fn, train_loader, val_loader, img_height, img_w
         l_acc.append(np.average(l_err))
 
         if validation_loss < lowest:
-            torch.save(model.state_dict(), f"../checkpoints/{config['model_name']}_best.pth")
+            torch.save(model.state_dict(), f"/content/CA-Cut-main/checkpoints/{config['model_name']}_best.pth")
             lowest = validation_loss
 
         print(f'Epoch: {epoch}, Train Loss: {training_loss:.4f}, Val Loss: {validation_loss:.4f}')
@@ -303,7 +327,7 @@ def train(model, optimizer, loss_fn, train_loader, val_loader, img_height, img_w
         plt.plot(list(range(len(train_loss))), train_loss, label='training loss')
         plt.plot(list(range(len(val_loss))), val_loss, label='validation loss')
         plt.legend()
-        plt.savefig('../plots/train_validation loss plot.png')
+        plt.savefig('/content/CA-Cut-main/plots/train_validation loss plot.png')
         plt.close()
 
         fig, ax1 = plt.subplots(num=2)
@@ -322,7 +346,7 @@ def train(model, optimizer, loss_fn, train_loader, val_loader, img_height, img_w
         ax2.set_ylabel("Validation Loss")
         ax2.legend(loc='upper right')
 
-        plt.savefig('../plots/validation_err_with_loss.png')
+        plt.savefig('/content/CA-Cut-main/plots/validation_err_with_loss.png')
         plt.close()
     
 def split_data(df, train_size: int):
@@ -340,7 +364,7 @@ def main(args):
     with open(config, 'r') as f:
         config = yaml.load(f, Loader=yaml.FullLoader)
     
-    df = pd.read_csv("../data/scaled_labels.csv")
+    df = pd.read_csv("/content/CA-Cut-main/data/scaled_labels.csv")
 
     df = df.sort_values(by=['image_name'])
 
